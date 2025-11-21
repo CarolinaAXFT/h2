@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego: El Auditor de Stock</title>
+    <title>Desafío: El Auditor</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background: #2c3e50;
+            font-family: 'Segoe UI', sans-serif;
+            background: #2c3e50; /* Fondo oscuro profesional */
             color: white;
             margin: 0;
             height: 100vh;
@@ -17,15 +17,51 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
         }
 
-        /* UI DEL JUEGO */
-        .game-ui {
+        /* --- PANTALLAS DE OVERLAY (Inicio / Fin) --- */
+        .screen-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(33, 37, 41, 0.98);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .hidden { display: none; }
+
+        h1 { font-size: 3rem; margin: 0 0 20px 0; color: #ffda79; text-transform: uppercase; letter-spacing: 2px; }
+        p { font-size: 1.2rem; line-height: 1.6; color: #ddd; max-width: 600px; margin-bottom: 40px; }
+        
+        .highlight { color: #4cd137; font-weight: bold; }
+        .highlight-bad { color: #ff5252; font-weight: bold; }
+
+        .btn-large {
+            background: #2b579a; /* Azul Tango */
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+        .btn-large:hover { transform: scale(1.05); background: #1e3c6b; }
+        .btn-secondary { background: #555; margin-left: 10px; }
+
+        /* --- INTERFAZ DEL JUEGO --- */
+        .game-container {
             width: 100%;
-            max-width: 500px;
-            position: relative;
-            height: 100vh;
+            max-width: 450px;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -33,174 +69,133 @@
             box-sizing: border-box;
         }
 
-        /* HUD SUPERIOR */
-        .hud {
+        /* HUD (Puntos y Tiempo) */
+        .hud-bar {
             display: flex;
             justify-content: space-between;
-            font-size: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            background: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
         }
-        .score-box span { color: #f1c40f; }
-        .time-box span { color: #e74c3c; }
+        .hud-item { font-size: 1.1rem; font-weight: 700; }
+        .score-val { color: #ffda79; }
+        .time-val { color: #ff5252; }
 
-        /* TARJETA CENTRAL */
-        .card-container {
+        /* TARJETA DEL CASO */
+        .card-area {
             flex: 1;
+            position: relative;
+            perspective: 1000px;
             display: flex;
             justify-content: center;
             align-items: center;
-            perspective: 1000px;
         }
 
         .card {
-            background: white;
-            color: #333;
             width: 100%;
-            max-width: 350px;
-            height: 420px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            box-sizing: border-box;
-            text-align: center;
-            position: absolute;
-            transition: transform 0.3s ease, opacity 0.3s;
-            border: 5px solid #ecf0f1;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: #333;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.4s ease-out, opacity 0.4s;
+            border: 1px solid #ccc;
         }
 
         .card-header {
-            background: #2b579a; /* Azul Tango */
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .card-avatar {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-
-        .card-data {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 15px;
-            text-align: left;
-            background: #f4f6f7;
+            background: #f1f2f6;
             padding: 15px;
-            border-radius: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
+        .avatar { font-size: 2.5rem; }
+        .user-info h3 { margin: 0; font-size: 1rem; color: #2b579a; }
+        .user-info span { font-size: 0.85rem; color: #666; font-weight: 600; }
 
-        .data-row { display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        .data-label { font-weight: bold; color: #7f8c8d; font-size: 12px; }
-        .data-value { font-weight: bold; color: #2c3e50; }
+        .card-body { padding: 20px; }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .data-label { font-size: 0.9rem; color: #888; font-weight: 600; }
+        .data-value { font-size: 0.95rem; color: #333; font-weight: 700; }
 
-        .card-stamp {
+        /* SELLOS (Aprobado/Rechazado) */
+        .stamp {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-15deg) scale(0);
-            font-size: 40px;
+            font-size: 3rem;
             font-weight: 900;
-            text-transform: uppercase;
-            border: 5px solid;
+            border: 6px solid;
             padding: 10px 20px;
             border-radius: 10px;
             opacity: 0;
             transition: all 0.2s;
-            z-index: 100;
-            text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
+            z-index: 10;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.8);
         }
 
-        /* CONTROLES INFERIORES */
-        .controls {
+        /* BOTONES DE ACCION */
+        .controls-area {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-top: 20px;
         }
-
-        .btn-action {
+        .action-btn {
             flex: 1;
-            padding: 20px;
+            padding: 15px;
             border: none;
-            border-radius: 15px;
-            font-size: 18px;
+            border-radius: 10px;
             font-weight: bold;
+            font-size: 1rem;
             cursor: pointer;
             text-transform: uppercase;
-            transition: transform 0.1s, filter 0.1s;
+            transition: transform 0.1s;
             color: white;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.3);
-        }
-        .btn-action:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,0.3); }
-        
-        .btn-reject { background: #e74c3c; } /* Rojo */
-        .btn-reject:hover { background: #c0392b; }
-        
-        .btn-approve { background: #27ae60; } /* Verde */
-        .btn-approve:hover { background: #219150; }
-
-        /* PANTALLAS DE INICIO / FIN */
-        .screen-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(44, 62, 80, 0.95);
-            z-index: 200;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
+            gap: 5px;
         }
-        .hidden { display: none; }
+        .action-btn:active { transform: scale(0.95); }
         
-        h1 { font-size: 40px; margin-bottom: 10px; color: #f1c40f; text-shadow: 2px 2px #000; }
-        p { font-size: 18px; max-width: 600px; line-height: 1.5; margin-bottom: 30px; }
+        .btn-reject { background-color: #ff5252; box-shadow: 0 4px 0 #d32f2f; }
+        .btn-approve { background-color: #2ecc71; box-shadow: 0 4px 0 #218c74; }
         
-        .big-btn {
-            background: #3498db;
-            color: white;
-            padding: 15px 40px;
-            font-size: 24px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .key-hint { font-size: 0.7rem; opacity: 0.7; font-weight: normal; }
 
-        .feedback-toast {
+        /* FEEDBACK FLOTANTE */
+        .toast {
             position: absolute;
-            bottom: 120px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
             background: #333;
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 0.9rem;
             opacity: 0;
             transition: opacity 0.3s;
+            width: 90%;
             text-align: center;
-            max-width: 80%;
+            pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        /* Animaciones de tarjeta */
-        .swipe-right { transform: translateX(500px) rotate(20deg); opacity: 0; }
-        .swipe-left { transform: translateX(-500px) rotate(-20deg); opacity: 0; }
+        /* Animaciones CSS */
+        .swipe-right { transform: translateX(100%) rotate(10deg) !important; opacity: 0 !important; }
+        .swipe-left { transform: translateX(-100%) rotate(-10deg) !important; opacity: 0 !important; }
 
     </style>
 </head>
@@ -208,266 +203,253 @@
 
     <!-- PANTALLA INICIO -->
     <div id="startScreen" class="screen-overlay">
-        <div style="font-size:60px">🕵️‍♂️</div>
-        <h1>EL AUDITOR DE TANGO</h1>
-        <p>Tienes <strong>60 segundos</strong>.<br>Revisa las operaciones de los usuarios.<br>Si la configuración o la lógica es incorrecta: <strong>RECHAZA</strong>.<br>Si todo está bien: <strong>APRUEBA</strong>.</p>
-        <button class="big-btn" onclick="startGame()">¡COMENZAR TURNO!</button>
+        <h1>¡SOS EL AUDITOR! 🕵️‍♂️</h1>
+        <p>
+            Te van a llegar operaciones de usuarios de Tango.<br><br>
+            Tu misión es simple:<br>
+            Si ves un error de configuración o lógica: <span class="highlight-bad">RECHAZÁ (Botón Rojo)</span>.<br>
+            Si la operación es correcta: <span class="highlight">APROBÁ (Botón Verde)</span>.
+        </p>
+        <p style="font-size: 0.9rem; color: #aaa;">(Tenés 60 segundos para sumar puntos)</p>
+        <button class="btn-large" onclick="startGame()">¡DALE, EMPEZÁ!</button>
     </div>
 
     <!-- PANTALLA FIN -->
     <div id="endScreen" class="screen-overlay hidden">
-        <div style="font-size:60px">🏁</div>
-        <h1>TURNO TERMINADO</h1>
-        <p>Puntaje Final: <strong id="finalScore" style="color:#f1c40f; font-size:30px">0</strong></p>
-        <p id="finalRank" style="font-style: italic; color:#ccc">Rango: Principiante</p>
-        <div style="display:flex; gap:20px; margin-top:20px;">
-            <button class="big-btn" onclick="location.reload()">REPETIR JUEGO</button>
-            <button class="big-btn" style="background:#555;" onclick="window.location.href='index.html'">VOLVER AL MENÚ</button>
+        <h1 style="font-size: 4rem;">⏱️ TIEMPO</h1>
+        <p>Tu Puntaje Final: <strong id="finalScore" style="font-size: 2rem; color: #ffda79;">0</strong></p>
+        <p id="finalRank" style="color:#aaa; font-style:italic;">Rango: Principiante</p>
+        
+        <div style="margin-top: 20px;">
+            <button class="btn-large" onclick="location.reload()">JUGAR DE NUEVO</button>
+            <button class="btn-large btn-secondary" onclick="window.location.href='index.html'">SALIR AL MENÚ</button>
         </div>
-    </div>
     </div>
 
     <!-- JUEGO -->
-    <div class="game-ui">
+    <div class="game-container">
         <!-- HUD -->
-        <div class="hud">
-            <div class="score-box">Puntos: <span id="score">0</span></div>
-            <div class="time-box">Tiempo: <span id="timer">60</span></div>
+        <div class="hud-bar">
+            <div class="hud-item">Puntos: <span id="score" class="score-val">0</span></div>
+            <div class="hud-item">Tiempo: <span id="timer" class="time-val">60</span>s</div>
         </div>
 
-        <!-- ZONA DE TARJETAS -->
-        <div class="card-container" id="cardZone">
-            <!-- La tarjeta se inyecta con JS -->
+        <!-- TARJETA -->
+        <div class="card-area" id="cardZone">
+            <!-- Aquí se inyecta la tarjeta por JS -->
         </div>
 
-        <div class="feedback-toast" id="feedback"></div>
+        <!-- MENSAJE FEEDBACK -->
+        <div id="feedbackToast" class="toast"></div>
 
-        <!-- CONTROLES -->
-        <div class="controls">
-            <button class="btn-action btn-reject" onclick="handleAction(false)">❌ RECHAZAR (Z)</button>
-            <button class="btn-action btn-approve" onclick="handleAction(true)">✅ APROBAR (M)</button>
+        <!-- BOTONES -->
+        <div class="controls-area">
+            <button class="action-btn btn-reject" onclick="processAction(false)">
+                <span>❌ Rechazar</span>
+                <span class="key-hint">(Tecla Z)</span>
+            </button>
+            <button class="action-btn btn-approve" onclick="processAction(true)">
+                <span>✅ Aprobar</span>
+                <span class="key-hint">(Tecla M)</span>
+            </button>
         </div>
     </div>
 
     <script>
-        /* --- BASE DE DATOS DE CASOS --- 
-           isValid: true (Aprobar), false (Rechazar)
-           reason: Explicación breve del error o acierto
-        */
+        // --- BASE DE DATOS DE CASOS (EN VOSEO) ---
         const cases = [
             {
-                user: "Operario Depósito",
-                avatar: "👷",
-                type: "Ingreso (ENT)",
+                role: "Operario Depósito", avatar: "👷", action: "Ingreso (ENT)",
                 data: { "Depósito": "01 - Central", "Valorizado": "NO", "Costo": "$ 0.00" },
                 isValid: true,
-                reason: "Correcto. Un ingreso no valorizado puede tener costo cero."
+                msg: "¡Exacto! Si no es valorizado, puede entrar con costo cero."
             },
             {
-                user: "Administrativo",
-                avatar: "👨‍💼",
-                type: "Ajuste (AJU)",
+                role: "Administrativo", avatar: "👨‍💼", action: "Ajuste (AJU)",
                 data: { "Depósito": "01 - Central", "Valorizado": "SÍ", "Costo": "$ 0.00" },
                 isValid: false,
-                reason: "¡Error! No se debe valorizar a costo cero, arruina el Precio Promedio (PPP)."
+                msg: "¡Error! No podés valorizar a costo cero, nos arruinás el precio promedio (PPP)."
             },
             {
-                user: "Vendedor",
-                avatar: "🧑‍💼",
-                type: "Talonario Alta",
-                data: { "Uso": "Interno", "Letra": "A", "Numeración": "Auto" },
+                role: "Vendedor", avatar: "🤵", action: "Alta Talonario",
+                data: { "Uso": "Interno", "Letra": "A", "Numeración": "Automática" },
                 isValid: false,
-                reason: "¡Error! Para uso interno se debe usar letra X, no letra A (Fiscal)."
+                msg: "¡Mal! Para uso interno se usa Letra 'X', la 'A' es fiscal."
             },
             {
-                user: "Supervisor",
-                avatar: "👩‍💻",
-                type: "Egreso (EGR)",
+                role: "Supervisor", avatar: "🕵️‍♀️", action: "Egreso (EGR)",
                 data: { "Perfil": "ROTURAS", "Fecha": "Editada (Ayer)", "Depósito": "99 - Averías" },
                 isValid: false,
-                reason: "¡Error! El perfil 'Roturas' tiene configurada la fecha como 'Fija/Actual' (no editable)."
+                msg: "¡Ojo! El perfil 'ROTURAS' tiene la fecha bloqueada al día de hoy."
             },
             {
-                user: "Jefe Compras",
-                avatar: "🤵",
-                type: "Ingreso (FAC)",
+                role: "Jefe Compras", avatar: "💼", action: "Ingreso (FAC)",
                 data: { "Talonario": "1 (Fiscal)", "Valorizado": "SÍ", "Prov": "Samsung" },
                 isValid: true,
-                reason: "Correcto. Factura de compra valorizada ingresando stock."
+                msg: "¡Correcto! Factura de compra valorizada, entra stock y costo."
             },
             {
-                user: "Operario",
-                avatar: "👷",
-                type: "Transferencia",
-                data: { "Origen": "01", "Destino": "01", "Cant": "10" },
+                role: "Operario", avatar: "👷", action: "Transferencia",
+                data: { "Origen": "01 - Central", "Destino": "01 - Central", "Cant": "10" },
                 isValid: false,
-                reason: "¡Ilógico! No se puede transferir del depósito 01 al mismo depósito 01."
+                msg: "¡Cualquiera! No tiene sentido transferir del depósito 01 al mismo 01."
             },
             {
-                user: "Sistemas",
-                avatar: "🤖",
-                type: "Perfil Nuevo",
+                role: "Sistemas", avatar: "💻", action: "Perfil Nuevo",
                 data: { "Carga Rápida": "SÍ", "Edita Cantidad": "SÍ", "Defecto": "1" },
                 isValid: true,
-                reason: "Configuración válida para uso de pistola de códigos de barras."
+                msg: "¡Bien! Configuración válida para usar pistola de códigos de barra."
             },
             {
-                user: "Logística",
-                avatar: "🚚",
-                type: "Transferencia",
-                data: { "Origen": "01", "Destino": "(Vacío)", "Cant": "50" },
+                role: "Logística", avatar: "🚚", action: "Transferencia",
+                data: { "Origen": "01 - Central", "Destino": "(Vacío)", "Cant": "50" },
                 isValid: false,
-                reason: "¡Error! Una transferencia requiere obligatoriamente un depósito de destino."
+                msg: "¡Falta info! Una transferencia sí o sí necesita un depósito de destino."
             },
             {
-                user: "Contador",
-                avatar: "📈",
-                type: "Egreso (EGR)",
-                data: { "Causa": "Consumo", "Valorizado": "SÍ", "Asiento": "Generado" },
+                role: "Contador", avatar: "📊", action: "Egreso (EGR)",
+                data: { "Causa": "Consumo Interno", "Valorizado": "SÍ", "Asiento": "Genera" },
                 isValid: true,
-                reason: "Correcto. Un egreso por consumo interno puede valorizarse y generar asiento de pérdida."
+                msg: "¡Perfecto! Un consumo interno se valoriza para mandarlo a pérdida contable."
             },
             {
-                user: "Operario",
-                avatar: "👷",
-                type: "Ingreso",
-                data: { "Artículo": "Servicio de Limpieza", "Depósito": "01", "Cant": "1" },
+                role: "Pasante", avatar: "👶", action: "Ingreso",
+                data: { "Artículo": "Servicio Limpieza", "Depósito": "01", "Cant": "1" },
                 isValid: false,
-                reason: "¡Error! Los servicios no llevan stock, no se ingresan por movimientos de stock."
+                msg: "¡Nada que ver! Los servicios no manejan stock físico."
             }
         ];
 
         let score = 0;
-        let timeLeft = 60;
-        let gameInterval;
-        let currentCard = null;
+        let time = 60;
+        let interval;
+        let currentCase = null;
+        let isProcessing = false;
 
         function startGame() {
             document.getElementById('startScreen').classList.add('hidden');
             score = 0;
-            timeLeft = 60;
-            updateUI();
-            gameInterval = setInterval(gameLoop, 1000);
-            nextCard();
+            time = 60;
+            updateHud();
+            loadCard();
+            interval = setInterval(() => {
+                time--;
+                updateHud();
+                if(time <= 0) endGame();
+            }, 1000);
         }
 
-        function gameLoop() {
-            timeLeft--;
-            updateUI();
-            if(timeLeft <= 0) {
-                endGame();
-            }
-        }
-
-        function updateUI() {
+        function updateHud() {
             document.getElementById('score').innerText = score;
-            document.getElementById('timer').innerText = timeLeft;
+            document.getElementById('timer').innerText = time;
         }
 
-        function nextCard() {
+        function loadCard() {
             const zone = document.getElementById('cardZone');
-            zone.innerHTML = ''; // Limpiar
-
-            // Elegir caso random
-            const caseData = cases[Math.floor(Math.random() * cases.length)];
-            currentCard = caseData; // Guardar referencia actual
-
-            // Construir HTML de la tarjeta
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'card';
+            zone.innerHTML = ''; 
             
-            let rowsHtml = '';
-            for (const [key, value] of Object.entries(caseData.data)) {
-                rowsHtml += `
-                    <div class="data-row">
-                        <span class="data-label">${key}</span>
-                        <span class="data-value">${value}</span>
-                    </div>
-                `;
+            // Seleccionar caso al azar
+            currentCase = cases[Math.floor(Math.random() * cases.length)];
+            
+            // Crear HTML
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = 'activeCard';
+            
+            let rows = '';
+            for(const [k, v] of Object.entries(currentCase.data)) {
+                rows += `<div class="data-row"><span class="data-label">${k}</span><span class="data-value">${v}</span></div>`;
             }
 
-            cardDiv.innerHTML = `
-                <div class="card-header">${caseData.type}</div>
-                <div class="card-avatar">${caseData.avatar}</div>
-                <div style="font-weight:bold; margin-bottom:10px; color:#555">${caseData.user}</div>
-                <div class="card-data">
-                    ${rowsHtml}
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="avatar">${currentCase.avatar}</div>
+                    <div class="user-info">
+                        <h3>${currentCase.action}</h3>
+                        <span>Usuario: ${currentCase.role}</span>
+                    </div>
                 </div>
-                <div class="card-stamp" id="stamp"></div>
+                <div class="card-body">${rows}</div>
+                <div id="stamp" class="stamp"></div>
             `;
-
-            zone.appendChild(cardDiv);
+            
+            zone.appendChild(card);
+            isProcessing = false;
         }
 
-        function handleAction(approved) {
-            if(!currentCard) return;
-            
-            const cardEl = document.querySelector('.card');
-            const stamp = document.getElementById('stamp');
-            const isCorrect = (approved === currentCard.isValid);
+        function processAction(approved) {
+            if(isProcessing) return;
+            isProcessing = true;
 
-            // 1. Mostrar sello visual
+            const card = document.getElementById('activeCard');
+            const stamp = document.getElementById('stamp');
+            const isCorrect = (approved === currentCase.isValid);
+
+            // 1. Mostrar Sello
             if(approved) {
                 stamp.innerText = "APROBADO";
-                stamp.style.color = "#27ae60";
-                stamp.style.borderColor = "#27ae60";
-                cardEl.classList.add('swipe-right');
+                stamp.style.color = "#2ecc71";
+                stamp.style.borderColor = "#2ecc71";
+                card.classList.add('swipe-right');
             } else {
                 stamp.innerText = "RECHAZADO";
-                stamp.style.color = "#e74c3c";
-                stamp.style.borderColor = "#e74c3c";
-                cardEl.classList.add('swipe-left');
+                stamp.style.color = "#ff5252";
+                stamp.style.borderColor = "#ff5252";
+                card.classList.add('swipe-left');
             }
-            
+            stamp.style.opacity = 1;
             stamp.style.transform = "translate(-50%, -50%) rotate(-15deg) scale(1)";
-            stamp.style.opacity = "1";
 
-            // 2. Calcular puntaje
+            // 2. Calcular Puntos y Feedback
             if(isCorrect) {
                 score += 100;
-                showToast("¡Bien hecho! " + currentCard.reason, true);
-                // Añadir tiempo extra por buenas respuestas (opcional)
-                // timeLeft += 2; 
+                showToast("✅ " + currentCase.msg, true);
             } else {
-                score = Math.max(0, score - 50);
-                showToast("¡Mal! " + currentCard.reason, false);
-                // Visual shake effect en UI principal podría ir aquí
+                score = Math.max(0, score - 50); // No bajar de 0
+                showToast("❌ " + currentCase.msg, false);
+                // Penalidad de tiempo por error grave
+                time = Math.max(0, time - 2);
             }
-            updateUI();
+            updateHud();
 
-            // 3. Siguiente tarjeta (con pequeño delay para animación)
+            // 3. Siguiente carta
             setTimeout(() => {
-                nextCard();
-            }, 300);
+                loadCard();
+            }, 400);
         }
 
         function showToast(msg, success) {
-            const t = document.getElementById('feedback');
+            const t = document.getElementById('feedbackToast');
             t.innerText = msg;
-            t.style.borderLeft = success ? "5px solid #27ae60" : "5px solid #e74c3c";
+            t.style.borderLeft = success ? "5px solid #2ecc71" : "5px solid #ff5252";
             t.style.opacity = 1;
-            setTimeout(() => { t.style.opacity = 0; }, 2000);
+            // Reiniciar animación
+            t.style.animation = 'none';
+            t.offsetHeight; /* trigger reflow */
+            t.style.animation = null; 
+            
+            setTimeout(() => { t.style.opacity = 0; }, 2500);
         }
 
         function endGame() {
-            clearInterval(gameInterval);
+            clearInterval(interval);
             document.getElementById('endScreen').classList.remove('hidden');
             document.getElementById('finalScore').innerText = score;
             
-            let rank = "Pasante de Depósito 📦";
-            if(score > 500) rank = "Operador Junior 📋";
-            if(score > 1000) rank = "Analista Senior 📈";
-            if(score > 2000) rank = "Auditor Experto (Leyenda) 🏆";
+            let rank = "Pasante de Depósito 🧹";
+            if(score > 800) rank = "Analista Junior 📋";
+            if(score > 1500) rank = "Auditor Senior 🧐";
+            if(score > 2500) rank = "Gerente de Sistemas 🏆";
             
             document.getElementById('finalRank').innerText = "Rango alcanzado: " + rank;
         }
 
-        // Soporte teclado
+        // Atajos de teclado
         document.addEventListener('keydown', (e) => {
             if(document.getElementById('startScreen').classList.contains('hidden') && 
                document.getElementById('endScreen').classList.contains('hidden')) {
-                if(e.key === 'z' || e.key === 'Z') handleAction(false);
-                if(e.key === 'm' || e.key === 'M') handleAction(true);
+                if(e.key.toLowerCase() === 'z') processAction(false);
+                if(e.key.toLowerCase() === 'm') processAction(true);
             }
         });
 
