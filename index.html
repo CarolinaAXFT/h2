@@ -3,354 +3,557 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Práctico TANGO STOCK</title>
+    <title>Simulador TANGO STOCK - Nivel Experto</title>
     <style>
-        /* --- ESTILOS GENERALES TANGO AI --- */
-        body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; color: #333; height: 100vh; overflow: hidden; }
+        /* --- ESTILOS TANGO AI (Actualizados) --- */
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #e9ecef; margin: 0; padding: 0; color: #333; height: 100vh; overflow: hidden; font-size: 13px; }
         
-        /* Barra Superior Global */
-        .top-bar { background: #fff; height: 48px; border-bottom: 1px solid #ddd; display: flex; align-items: center; padding: 0 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .logo { font-weight: bold; font-size: 20px; color: #2b579a; margin-right: 20px; cursor: pointer; }
-        .breadcrumb { color: #777; font-size: 14px; }
+        /* Barra Superior */
+        .top-bar { background: #fff; height: 48px; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 0 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); z-index: 100; position:relative; }
+        .logo { font-weight: 700; font-size: 20px; color: #2b579a; margin-right: 20px; cursor: pointer; display:flex; align-items:center; gap:5px; }
+        .breadcrumb { color: #666; font-size: 13px; border-left: 1px solid #ccc; padding-left: 15px; margin-left: 15px; height: 20px; display: flex; align-items: center; }
         
-        /* Contenedores de Vistas */
+        /* Contenedores */
         .view-section { display: none; height: calc(100vh - 50px); overflow-y: auto; padding: 20px; box-sizing: border-box; }
-        .view-section.active { display: block; }
+        .view-section.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- VISTA MENU PRINCIPAL --- */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1000px; margin: 40px auto; }
-        .menu-card { background: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: #5c7cfa; }
-        .card-header { background: #f8f9fa; padding: 15px; border-bottom: 1px solid #eee; font-weight: bold; color: #2b579a; display: flex; justify-content: space-between; }
-        .card-body { padding: 20px; color: #555; font-size: 14px; line-height: 1.5; }
-        .card-badge { background: #e9ecef; color: #495057; padding: 3px 8px; border-radius: 10px; font-size: 11px; }
-        .card-footer { padding: 15px; background: white; border-top: 1px solid #eee; text-align: right; }
-        .btn-start { background: #2b579a; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: 500; }
-        .btn-start:hover { background: #1d4075; }
+        /* MENU PRINCIPAL */
+        .menu-header { text-align: center; margin-bottom: 40px; margin-top: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; max-width: 1100px; margin: 0 auto; }
+        .menu-card { background: white; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; transition: all 0.2s; cursor: pointer; position: relative; }
+        .menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-color: #2b579a; }
+        .card-top { height: 6px; background: #ddd; }
+        .menu-card:nth-child(1) .card-top { background: #4cd137; }
+        .menu-card:nth-child(2) .card-top { background: #fbc531; }
+        .menu-card:nth-child(3) .card-top { background: #e84118; }
+        .card-content { padding: 25px; }
+        .card-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: #333; }
+        .card-desc { color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px; min-height: 60px; }
+        .btn-start { background: #2b579a; color: white; border: none; padding: 8px 0; width: 100%; border-radius: 4px; font-weight: 600; cursor: pointer; }
+        .btn-start:hover { background: #1e3c6b; }
 
-        /* --- ESTILOS FORMULARIOS TANGO (Vistas Ejercicios) --- */
-        .tango-container { background: #fff; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; border-radius: 4px; overflow: hidden; }
-        .entity-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        /* CAJA DE CONSIGNA (NUEVO) */
+        .scenario-box { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 13px; max-width: 950px; margin-left: auto; margin-right: auto; display: flex; gap: 15px; align-items: flex-start; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .scenario-icon { font-size: 24px; }
+        .scenario-text strong { display: block; margin-bottom: 5px; color: #533f03; }
+        .scenario-list { margin: 5px 0 0 20px; padding: 0; }
+        .scenario-list li { margin-bottom: 3px; }
+
+        /* FORMULARIOS TANGO WEB */
+        .tango-container { background: #fff; border: 1px solid #ccc; max-width: 950px; margin: 0 auto 40px; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .entity-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
         .entity-title { font-size: 16px; font-weight: 600; color: #333; }
-        .action-bar { padding: 10px 20px; background: #fff; border-bottom: 1px solid #ddd; display: flex; gap: 5px; }
         
-        .btn { padding: 6px 12px; border: 1px solid transparent; cursor: pointer; font-size: 13px; border-radius: 3px; font-weight: 500; }
-        .btn-accept { background-color: #28a745; color: white; }
-        .btn-cancel { background-color: #dc3545; color: white; }
-        .btn-toolbar { background: #fff; border: 1px solid #ccc; color: #333; }
+        .action-bar { padding: 8px 20px; background: #fcfcfc; border-bottom: 1px solid #ddd; display: flex; gap: 6px; }
+        .btn-toolbar { padding: 6px 15px; border: 1px solid transparent; border-radius: 3px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-accept { background: #28a745; color: white; border-color: #218838; }
+        .btn-accept:hover { background: #218838; }
+        .btn-cancel { background: #dc3545; color: white; border-color: #c82333; }
+        .btn-help { background: #fff; border-color: #ccc; color: #333; }
+
+        .tabs { display: flex; background: #f8f9fa; border-bottom: 1px solid #ddd; padding-left: 10px; margin-top: 10px; }
+        .tab { padding: 10px 20px; cursor: pointer; color: #666; border: 1px solid transparent; border-bottom: none; margin-bottom: -1px; font-size: 12px; }
+        .tab.active { background: #fff; border-color: #ddd; border-bottom-color: #fff; color: #2b579a; border-top: 2px solid #2b579a; font-weight: 600; }
+
+        .form-body { padding: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .full-width { grid-column: 1 / -1; }
         
-        .tabs { display: flex; border-bottom: 1px solid #ddd; background: #f9f9f9; padding-left: 10px; margin-top: 10px; }
-        .tab { padding: 8px 15px; cursor: pointer; color: #666; border-bottom: 2px solid transparent; }
-        .tab.active { background: #fff; color: #2b579a; border-bottom: 2px solid #2b579a; font-weight: 600; }
+        .form-group { margin-bottom: 15px; }
+        .label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; font-size: 12px; }
+        .input, .select { width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; box-sizing: border-box; transition: border 0.2s; }
+        .input:focus, .select:focus { border-color: #2b579a; outline: none; }
+        .input:disabled { background: #f0f0f0; color: #888; }
 
-        .form-content { padding: 20px; }
-        .form-row { margin-bottom: 15px; }
-        .form-label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; font-size: 13px; }
-        .form-input, .form-select { width: 100%; max-width: 400px; padding: 6px; border: 1px solid #ccc; border-radius: 2px; font-size: 13px; box-sizing: border-box; }
-        .form-input:disabled { background: #f0f0f0; color: #888; }
+        /* Checkboxes estilizados */
+        .check-list { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .check-item { display: flex; align-items: center; font-size: 12px; cursor: pointer; }
+        .check-item input { margin-right: 8px; accent-color: #2b579a; }
+
+        /* VENTANA FLOTANTE (NIVEL 3) */
+        .window-wrap { max-width: 950px; margin: 0 auto; background: white; border: 1px solid #999; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border-radius: 4px; overflow: hidden; }
+        .window-title-bar { background: linear-gradient(180deg, #eef2f8 0%, #d3deed 100%); padding: 6px 10px; border-bottom: 1px solid #a0a0a0; display: flex; justify-content: space-between; align-items: center; }
+        .window-toolbar { background: #f5f5f5; padding: 5px; border-bottom: 1px solid #ddd; display: flex; gap: 10px; }
+        .tool-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 3px; cursor: pointer; font-size: 16px; }
+        .tool-btn:hover { border-color: #ccc; background: #e6e6e6; }
         
-        .check-group { margin-top: 10px; }
-        .check-item { margin-bottom: 8px; display: flex; align-items: center; font-size: 13px; }
-        .check-input { margin-right: 8px; }
+        .grid-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; border: 1px solid #bbb; background: #fff; }
+        .grid-table th { background: #e6e6e6; border: 1px solid #bbb; padding: 6px; text-align: left; font-weight: 600; color: #333; }
+        .grid-table td { border: 1px solid #eee; padding: 0; }
+        .grid-input { width: 100%; border: none; padding: 6px; box-sizing: border-box; font-family: inherit; font-size: 12px; }
+        .grid-input:focus { background: #e8f0fe; outline: 2px solid #2b579a; }
 
-        /* Modal Feedback */
-        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background: white; padding: 25px; border-radius: 8px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
-        .modal-icon { font-size: 40px; margin-bottom: 10px; display: block; }
-        .modal-title { font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #333; }
-        .modal-body { margin-bottom: 20px; font-size: 14px; color: #555; line-height: 1.4; }
-        .modal-footer button { margin: 0 5px; }
-
-        /* Estilos específicos ventana flotante (Ejercicio 3) */
-        .window-frame { width: 100%; max-width: 850px; background: #fff; border: 1px solid #aaa; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 4px; margin: 0 auto; }
-        .window-title-bar { background: linear-gradient(to bottom, #e6efff 0%, #d0e0ff 100%); padding: 8px 10px; border-bottom: 1px solid #b0c0d0; display: flex; justify-content: space-between; border-radius: 4px 4px 0 0; }
-        .grid-container { border: 1px solid #999; background: #fff; margin-top: 15px; }
-        .grid-row { display: flex; border-bottom: 1px solid #eee; }
-        .grid-col { padding: 5px; border-right: 1px solid #eee; font-size: 12px; }
-        .grid-header { background: #f0f0f0; font-weight: bold; }
+        /* FEEDBACK MODAL */
+        .overlay { position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal { background: white; width: 450px; padding: 0; border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden; animation: popIn 0.3s; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; font-weight: 700; font-size: 16px; }
+        .modal-header.success { background: #d4edda; color: #155724; }
+        .modal-header.error { background: #f8d7da; color: #721c24; }
+        .modal-body { padding: 20px; font-size: 14px; line-height: 1.5; color: #444; }
+        .modal-footer { padding: 15px; background: #f8f9fa; text-align: right; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
 
-    <!-- BARRA SUPERIOR -->
+    <!-- TOP BAR -->
     <div class="top-bar">
-        <div class="logo" onclick="showMenu()">TANGO <span style="font-size:12px;color:#888">AI</span></div>
-        <div class="breadcrumb" id="navText">Simulador de Práctica / Inicio</div>
+        <div class="logo" onclick="showMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#2b579a"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z"/></svg>
+            TANGO STOCK
+        </div>
+        <div class="breadcrumb" id="breadText">Inicio</div>
     </div>
 
-    <!-- MENÚ PRINCIPAL -->
-    <div id="menuView" class="view-section active">
-        <div style="text-align:center; margin-top:20px;">
-            <h2 style="color:#2b579a;">Ejercicios de Práctica: Módulo Stock</h2>
-            <p style="color:#666;">Seleccione un nivel para comenzar la simulación.</p>
+    <!-- MENU PRINCIPAL -->
+    <div id="view-menu" class="view-section active">
+        <div class="menu-header">
+            <h1 style="color:#333; margin-bottom: 10px;">Simulador de Práctica: Módulo Stock</h1>
+            <p style="color:#666;">Seleccione un ejercicio para demostrar sus conocimientos.</p>
         </div>
 
         <div class="menu-grid">
             <!-- Nivel 1 -->
-            <div class="menu-card" onclick="startLevel(1)">
-                <div class="card-header">Nivel 1: Comprobantes <span class="card-badge">Básico</span></div>
-                <div class="card-body">
-                    Configure un comprobante de "Muestras Gratis".<br>
-                    <strong>Objetivo:</strong> Ingresar stock sin afectar costos.
+            <div class="menu-card" onclick="loadLevel(1)">
+                <div class="card-top"></div>
+                <div class="card-content">
+                    <div class="card-title">Nivel 1: Tipos de Comprobante</div>
+                    <div class="card-desc">
+                        Configure un nuevo tipo de comprobante para gestionar <strong>Muestras y Regalos</strong> de proveedores.
+                    </div>
+                    <button class="btn-start">Iniciar Configuración</button>
                 </div>
-                <div class="card-footer"><button class="btn-start">Comenzar</button></div>
             </div>
 
             <!-- Nivel 2 -->
-            <div class="menu-card" onclick="startLevel(2)">
-                <div class="card-header">Nivel 2: Talonarios <span class="card-badge">Intermedio</span></div>
-                <div class="card-body">
-                    Configure un talonario para movimientos internos.<br>
-                    <strong>Objetivo:</strong> Control de numeración automática (Letra X).
+            <div class="menu-card" onclick="loadLevel(2)">
+                <div class="card-top"></div>
+                <div class="card-content">
+                    <div class="card-title">Nivel 2: Talonarios</div>
+                    <div class="card-desc">
+                        La empresa necesita un talonario para movimientos <strong>Internos</strong> entre el Showroom y el Depósito.
+                    </div>
+                    <button class="btn-start">Iniciar Alta</button>
                 </div>
-                <div class="card-footer"><button class="btn-start">Comenzar</button></div>
             </div>
 
             <!-- Nivel 3 -->
-            <div class="menu-card" onclick="startLevel(3)">
-                <div class="card-header">Nivel 3: Operación <span class="card-badge">Avanzado</span></div>
-                <div class="card-body">
-                    Realice el ingreso de una compra.<br>
-                    <strong>Objetivo:</strong> Selección correcta de depósitos y comprobantes valorizados.
+            <div class="menu-card" onclick="loadLevel(3)">
+                <div class="card-top"></div>
+                <div class="card-content">
+                    <div class="card-title">Nivel 3: Operación de Ingreso</div>
+                    <div class="card-desc">
+                        Registre una <strong>Factura de Compra</strong> de un proveedor real. Atención a los depósitos, precios y cantidades.
+                    </div>
+                    <button class="btn-start">Iniciar Operación</button>
                 </div>
-                <div class="card-footer"><button class="btn-start">Comenzar</button></div>
             </div>
         </div>
     </div>
 
-    <!-- EJERCICIO 1 -->
-    <div id="level1" class="view-section">
+    <!-- NIVEL 1: CONFIGURACION COMPROBANTE -->
+    <div id="view-level1" class="view-section">
+        <div class="scenario-box">
+            <div class="scenario-icon">💡</div>
+            <div class="scenario-text">
+                <strong>Caso de Uso: "Muestras de Proveedores"</strong>
+                El proveedor "Samsung" nos envía mercadería de demostración (Dummies) a costo cero. 
+                <ul>
+                    <li>Cree el comprobante con código <strong>MUE</strong>.</li>
+                    <li><strong>Requisito:</strong> El stock debe aumentar físicamente, pero <strong>NO</strong> debe afectar nuestro Precio Promedio Ponderado (PPP) ni costos.</li>
+                    <li>Asocie el talonario de "Ajustes".</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="tango-container">
             <div class="entity-header">
-                <div class="entity-title">📄 Tipos de comprobante: NUEVO</div>
-                <small style="color:#666">Consigna: Configurar Ingreso de Muestras (Sin costo)</small>
+                <span style="font-size:20px">📄</span>
+                <div class="entity-title">Tipos de comprobante: NUEVO</div>
             </div>
             <div class="action-bar">
-                <button class="btn btn-accept" onclick="checkLevel1()">Aceptar</button>
-                <button class="btn btn-cancel" onclick="showMenu()">Cancelar</button>
+                <button class="btn-toolbar btn-accept" onclick="checkL1()">Aceptar</button>
+                <button class="btn-toolbar btn-cancel" onclick="showMenu()">Cancelar</button>
+                <button class="btn-toolbar btn-help">Ayuda</button>
             </div>
+            
             <div class="tabs">
                 <div class="tab active">Principal</div>
                 <div class="tab">Observaciones</div>
+                <div class="tab">Campos adicionales</div>
             </div>
-            <div class="form-content">
-                <div class="form-row"><label class="form-label">Código</label><input class="form-input" value="MUE" disabled></div>
-                <div class="form-row"><label class="form-label">Descripción</label><input class="form-input" value="MUESTRAS GRATIS"></div>
-                <div class="form-row">
-                    <label class="form-label">Tipo de movimiento</label>
-                    <select id="l1_mov" class="form-select">
+
+            <div class="form-body">
+                <div class="form-group">
+                    <label class="label">Código</label>
+                    <input class="input" value="MUE" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="label">Descripción</label>
+                    <input class="input" value="MUESTRAS / REGALOS PROV.">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Tipo de movimiento</label>
+                    <select id="l1_mov" class="select">
                         <option value="0">Seleccione...</option>
                         <option value="E">Entrada</option>
                         <option value="S">Salida</option>
+                        <option value="T">Transferencia</option>
+                        <option value="I">Inventario</option>
                     </select>
                 </div>
-                <div class="check-group">
-                    <div class="check-item"><input type="checkbox" id="l1_val" class="check-input"><label>Valorizado</label></div>
-                    <div class="check-item"><input type="checkbox" checked class="check-input"><label>Admite reingreso de serie</label></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- EJERCICIO 2 -->
-    <div id="level2" class="view-section">
-        <div class="tango-container">
-            <div class="entity-header">
-                <div class="entity-title">🔢 Talonarios: 50, AJUSTES INTERNOS</div>
-                <small style="color:#666">Consigna: Numeración automática para uso interno</small>
-            </div>
-            <div class="action-bar">
-                <button class="btn btn-accept" onclick="checkLevel2()">Aceptar</button>
-                <button class="btn btn-cancel" onclick="showMenu()">Cancelar</button>
-            </div>
-            <div class="tabs"><div class="tab active">Principal</div><div class="tab">Impresión</div></div>
-            <div class="form-content">
-                <div class="form-row"><label class="form-label">Código</label><input class="form-input" value="50" disabled style="width:50px"></div>
-                <div class="form-row">
-                    <label class="form-label">Tipo de Talonario / Letra</label>
-                    <select id="l2_letra" class="form-select">
-                        <option value="0">...</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="X">X</option>
+                <div class="form-group">
+                    <label class="label">Talonario asociado</label>
+                    <select id="l1_tal" class="select">
+                        <option value="0">Seleccione...</option>
+                        <option value="1">1 - INGRESOS DE COMPRA</option>
+                        <option value="5">5 - AJUSTES DE STOCK</option>
+                        <option value="2">2 - EGRESOS</option>
                     </select>
                 </div>
-                <div class="form-row">
-                    <div class="check-item"><input type="checkbox" id="l2_edita" class="check-input"><label>Edita número de comprobante</label></div>
-                </div>
-                <div style="margin-top:20px; border-top:1px solid #eee; padding-top:10px">
-                    <strong style="color:#2b579a; font-size:12px">Numeración</strong>
-                    <div style="display:flex; gap:10px; margin-top:10px">
-                        <div style="flex:1"><label class="form-label">Próximo nro</label><input id="l2_prox" type="number" class="form-input" placeholder="Ej: 1"></div>
-                        <div style="flex:1"><label class="form-label">Último nro</label><input value="100000" disabled class="form-input"></div>
+
+                <div class="full-width" style="border-top:1px solid #eee; padding-top:10px;">
+                    <label class="label" style="color:#2b579a; margin-bottom:10px;">Comportamiento</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr;">
+                        <div class="check-list">
+                            <label class="check-item"><input type="checkbox" id="l1_val"> Valorizado</label>
+                            <label class="check-item"><input type="checkbox" id="l1_stk" checked> Actualiza Stock</label>
+                        </div>
+                        <div class="check-list">
+                            <label class="check-item"><input type="checkbox" id="l1_sub"> Genera Asiento Contable</label>
+                            <label class="check-item"><input type="checkbox" id="l1_cero"> Permite Precio Cero</label>
+                        </div>
+                        <div class="check-list">
+                            <label class="check-item"><input type="checkbox" checked disabled> Admite reingreso serie</label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- EJERCICIO 3 -->
-    <div id="level3" class="view-section">
-        <div class="window-frame">
+    <!-- NIVEL 2: TALONARIOS -->
+    <div id="view-level2" class="view-section">
+        <div class="scenario-box">
+            <div class="scenario-icon">🔢</div>
+            <div class="scenario-text">
+                <strong>Caso de Uso: "Movimientos Internos"</strong>
+                Configure el talonario <strong>50</strong> para usar en traslados internos (No Fiscales).
+                <ul>
+                    <li><strong>Tipo de Letra:</strong> Seleccione la adecuada para movimientos internos (No es A ni B).</li>
+                    <li><strong>Numeración:</strong> Queremos control estricto. El sistema debe numerar solo (automático) empezando del 1.</li>
+                    <li><strong>Sucursal:</strong> Asocie a la Sucursal "00001 - Casa Central".</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="tango-container">
+            <div class="entity-header">
+                <span style="font-size:20px">🔢</span>
+                <div class="entity-title">Talonarios: 50 - TRASLADOS INTERNOS</div>
+            </div>
+            <div class="action-bar">
+                <button class="btn-toolbar btn-accept" onclick="checkL2()">Aceptar</button>
+                <button class="btn-toolbar btn-cancel" onclick="showMenu()">Cancelar</button>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active">Principal</div>
+                <div class="tab">Impresión</div>
+            </div>
+
+            <div class="form-body">
+                <div class="form-group">
+                    <label class="label">Código</label>
+                    <input class="input" value="50" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="label">Sucursal asociada</label>
+                    <select id="l2_suc" class="select">
+                        <option value="0">Seleccione...</option>
+                        <option value="1">00001 - Casa Central</option>
+                        <option value="2">00002 - Depósito Norte</option>
+                        <option value="9">00099 - Administración</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Tipo de Talonario / Letra</label>
+                    <select id="l2_letra" class="select">
+                        <option value="0">Seleccione...</option>
+                        <option value="A">A (Responsable Inscripto)</option>
+                        <option value="B">B (Consumidor Final)</option>
+                        <option value="M">M (Responsable Monotributo)</option>
+                        <option value="X">X (Remito / Interno)</option>
+                        <option value="R">R (Remito Oficial)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Destino de impresión</label>
+                    <select class="select">
+                        <option>Impresora Predeterminada</option>
+                        <option>PDF</option>
+                    </select>
+                </div>
+
+                <div class="full-width" style="border-top:1px solid #eee; padding-top:10px;">
+                    <label class="label" style="color:#2b579a;">Configuración de Numeración</label>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:10px;">
+                        <div class="check-list">
+                            <label class="check-item"><input type="checkbox" id="l2_edita"> Edita número de comprobante</label>
+                            <label class="check-item"><input type="checkbox"> Controla correlatividad fechas</label>
+                        </div>
+                        <div>
+                            <label class="label">Próximo número a emitir</label>
+                            <input type="number" id="l2_prox" class="input" placeholder="Ej: 00000001">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NIVEL 3: OPERACION -->
+    <div id="view-level3" class="view-section">
+        <div class="scenario-box">
+            <div class="scenario-icon">🛒</div>
+            <div class="scenario-text">
+                <strong>Caso de Uso: "Factura de Compra"</strong>
+                Ingrese la factura física que tiene en mano con los siguientes datos:
+                <ul>
+                    <li><strong>Proveedor:</strong> DISTRIBUIDORA ELECTRO S.A.</li>
+                    <li><strong>Comprobante:</strong> Factura de Compra (Valoriza). Nro: <strong>A0001-00001234</strong>.</li>
+                    <li><strong>Depósito Destino:</strong> 01 - CASA CENTRAL (Aquí vendemos).</li>
+                    <li><strong>Artículo:</strong> 10 unidades de "HELADERA SAMSUNG".</li>
+                    <li><strong>Costo Unitario:</strong> $ 850.000 (Pesos).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="window-wrap">
             <div class="window-title-bar">
-                <div style="font-weight:bold; font-size:12px; color:#333">🖥 INGRESOS DE STOCK (SUPERVISOR)</div>
-                <div style="display:flex; gap:5px"><span style="width:10px;height:10px;background:#ccc;border-radius:50%"></span></div>
+                <div style="font-weight:bold; font-size:12px; color:#444">🖥 INGRESOS DE STOCK (SUPERVISOR)</div>
+                <div style="font-size:10px; color:#666">Empresa Ejemplo</div>
             </div>
-            <div style="padding:5px; background:#fcfcfc; border-bottom:1px solid #ddd; display:flex; gap:15px">
-                <button class="btn btn-accept" onclick="checkLevel3()">✔ (F10)</button>
-                <button class="btn btn-cancel" onclick="showMenu()">✖ Cancelar</button>
+            <div class="window-toolbar">
+                <button class="tool-btn" style="color:#28a745" title="F10" onclick="checkL3()">✔</button>
+                <button class="tool-btn" style="color:#dc3545" onclick="showMenu()">✖</button>
+                <div style="width:1px; background:#ccc; margin:0 5px;"></div>
+                <button class="tool-btn">⚙</button>
             </div>
-            <div style="padding:15px; min-height:300px">
-                <small style="display:block; margin-bottom:10px; background:#eef; padding:5px; border-radius:3px; color:#333">Consigna: Ingrese compra de mercadería al depósito Central.</small>
-                
-                <div style="display:flex; gap:20px; margin-bottom:20px">
+            
+            <div style="padding:20px;">
+                <!-- CABECERA COMPROBANTE -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:20px; background:#f9f9f9; padding:10px; border:1px solid #eee;">
                     <div>
-                        <label class="form-label">Comprobante</label>
-                        <select id="l3_comp" class="form-select" style="width:100px">
-                            <option value="">...</option>
-                            <option value="AJU">AJU</option>
-                            <option value="FAC">FAC</option>
+                        <label class="label">Tipo Comprobante</label>
+                        <select id="l3_tipo" class="input">
+                            <option value="0">...</option>
+                            <option value="AJU">AJU - AJUSTE STOCK</option>
+                            <option value="FAC">FAC - FACTURA COMPRA</option>
+                            <option value="REM">REM - REMITO INGRESO</option>
                         </select>
                     </div>
                     <div>
-                        <label class="form-label">Depósito</label>
-                        <input id="l3_dep" class="form-input" style="width:50px" placeholder="00">
+                        <label class="label">Nro. Comprobante</label>
+                        <input id="l3_nro" class="input" placeholder="X0000-00000000">
+                    </div>
+                    <div>
+                        <label class="label">Proveedor</label>
+                        <select id="l3_prov" class="input">
+                            <option value="0">Seleccione...</option>
+                            <option value="100">SAMSUNG ELECTRONICS</option>
+                            <option value="200">DISTRIBUIDORA ELECTRO S.A.</option>
+                            <option value="300">FLETES Y LOGISTICA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="label">Depósito Destino</label>
+                        <input id="l3_dep" class="input" style="width:50px" placeholder="00"> <span style="font-size:11px; color:#666"> (00-99)</span>
+                    </div>
+                    <div>
+                        <label class="label">Moneda</label>
+                        <select class="input" disabled><option>1 - $ PESOS</option></select>
+                    </div>
+                    <div>
+                        <label class="label">Cotización</label>
+                        <input class="input" value="1.0000" disabled>
                     </div>
                 </div>
 
-                <div class="grid-container">
-                    <div class="grid-row grid-header">
-                        <div class="grid-col" style="width:100px">Código</div>
-                        <div class="grid-col" style="flex:1">Descripción</div>
-                        <div class="grid-col" style="width:60px">Cant.</div>
-                    </div>
-                    <div class="grid-row">
-                        <div class="grid-col" style="width:100px">HEL-001</div>
-                        <div class="grid-col" style="flex:1">Heladera Samsung</div>
-                        <div class="grid-col" style="width:60px"><input id="l3_cant" type="number" style="width:100%; border:none" placeholder="0"></div>
-                    </div>
+                <!-- GRILLA ARTICULOS -->
+                <table class="grid-table">
+                    <thead>
+                        <tr>
+                            <th style="width:120px">Código</th>
+                            <th>Descripción</th>
+                            <th style="width:60px">Cant.</th>
+                            <th style="width:100px">Precio Unit.</th>
+                            <th style="width:100px">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input class="grid-input" value="HEL-SAM-INV" title="HELADERA SAMSUNG"></td>
+                            <td><input class="grid-input" value="Heladera Samsung Inverter 400L" disabled style="background:#f5f5f5"></td>
+                            <td><input id="l3_cant" type="number" class="grid-input" placeholder="0"></td>
+                            <td><input id="l3_precio" type="number" class="grid-input" placeholder="0.00"></td>
+                            <td><input class="grid-input" value="0.00" disabled style="background:#f5f5f5"></td>
+                        </tr>
+                        <tr>
+                            <td><input class="grid-input"></td>
+                            <td><input class="grid-input" disabled style="background:#f5f5f5"></td>
+                            <td><input class="grid-input" disabled></td>
+                            <td><input class="grid-input" disabled></td>
+                            <td><input class="grid-input" disabled style="background:#f5f5f5"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="text-align:right; margin-top:10px; font-weight:bold; color:#2b579a">
+                    TOTAL COMPROBANTE: $ <span id="l3_total">0.00</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MODAL FEEDBACK -->
-    <div id="overlay" class="modal-overlay">
-        <div class="modal-box">
-            <span id="mIcon" class="modal-icon"></span>
-            <div id="mTitle" class="modal-title"></div>
-            <div id="mBody" class="modal-body"></div>
+    <div class="overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header" id="mHeader">Resultado</div>
+            <div class="modal-body" id="mBody">Mensaje...</div>
             <div class="modal-footer">
-                <button class="btn btn-toolbar" onclick="closeModal()">Cerrar</button>
-                <button id="btnBackMenu" class="btn btn-start" style="display:none" onclick="closeModal(); showMenu()">Volver al Menú</button>
+                <button class="btn-toolbar" onclick="closeModal()">Cerrar y Corregir</button>
+                <button class="btn-toolbar btn-accept" id="btnExit" onclick="showMenu()" style="display:none">Volver al Menú</button>
             </div>
         </div>
     </div>
 
     <script>
         // --- NAVEGACION ---
-        function hideAll() {
+        function showMenu(){
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-menu').classList.add('active');
+            document.getElementById('breadText').innerText = "Inicio";
         }
-        function showMenu() {
-            hideAll();
-            document.getElementById('menuView').classList.add('active');
-            document.getElementById('navText').innerText = "Simulador de Práctica / Inicio";
-        }
-        function startLevel(lvl) {
-            hideAll();
-            document.getElementById('level'+lvl).classList.add('active');
-            let title = "";
-            if(lvl==1) title = "Configuración Comprobante";
-            if(lvl==2) title = "Configuración Talonario";
-            if(lvl==3) title = "Operación de Stock";
-            document.getElementById('navText').innerText = "Simulador / Nivel " + lvl + ": " + title;
-            resetInputs(lvl);
-        }
-
-        function resetInputs(lvl) {
-            // Limpia los inputs al entrar para reintentar
-            if(lvl==1) { document.getElementById('l1_mov').value = '0'; document.getElementById('l1_val').checked = false; }
-            if(lvl==2) { document.getElementById('l2_letra').value = '0'; document.getElementById('l2_edita').checked = false; document.getElementById('l2_prox').value = ''; }
-            if(lvl==3) { document.getElementById('l3_comp').value = ''; document.getElementById('l3_dep').value = ''; document.getElementById('l3_cant').value = ''; }
-        }
-
-        // --- FEEDBACK ---
-        function showModal(success, title, msg) {
-            const overlay = document.getElementById('overlay');
-            const mTitle = document.getElementById('mTitle');
-            const mBody = document.getElementById('mBody');
-            const mIcon = document.getElementById('mIcon');
-            const btnBack = document.getElementById('btnBackMenu');
-
-            mTitle.innerText = title;
-            mBody.innerHTML = msg;
+        function loadLevel(lvl){
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-level'+lvl).classList.add('active');
             
-            if(success) {
-                mTitle.style.color = "#28a745";
-                mIcon.innerText = "🎉";
-                btnBack.style.display = "inline-block";
-            } else {
-                mTitle.style.color = "#dc3545";
-                mIcon.innerText = "⚠️";
-                btnBack.style.display = "none";
+            let names = ["", "Configuración Comprobantes", "Alta de Talonarios", "Ingreso de Stock"];
+            document.getElementById('breadText').innerText = names[lvl];
+            resetForms(lvl);
+        }
+        function resetForms(lvl){
+            // Limpiar formularios al entrar
+            if(lvl===1){
+                document.getElementById('l1_mov').value = '0';
+                document.getElementById('l1_tal').value = '0';
+                document.getElementById('l1_val').checked = false;
+                document.getElementById('l1_sub').checked = false;
+                document.getElementById('l1_cero').checked = false;
             }
-            overlay.style.display = 'flex';
+            if(lvl===2){
+                document.getElementById('l2_suc').value = '0';
+                document.getElementById('l2_letra').value = '0';
+                document.getElementById('l2_edita').checked = false;
+                document.getElementById('l2_prox').value = '';
+            }
+            if(lvl===3){
+                document.getElementById('l3_tipo').value = '0';
+                document.getElementById('l3_nro').value = '';
+                document.getElementById('l3_prov').value = '0';
+                document.getElementById('l3_dep').value = '';
+                document.getElementById('l3_cant').value = '';
+                document.getElementById('l3_precio').value = '';
+            }
         }
 
-        function closeModal() {
-            document.getElementById('overlay').style.display = 'none';
+        // --- MODAL ---
+        function showFeedback(success, title, msg){
+            const m = document.getElementById('modal');
+            const h = document.getElementById('mHeader');
+            const b = document.getElementById('mBody');
+            const btn = document.getElementById('btnExit');
+
+            m.style.display = 'flex';
+            h.innerText = title;
+            b.innerHTML = msg;
+            
+            if(success){
+                h.className = 'modal-header success';
+                btn.style.display = 'inline-block';
+            } else {
+                h.className = 'modal-header error';
+                btn.style.display = 'none';
+            }
+        }
+        function closeModal(){
+            document.getElementById('modal').style.display = 'none';
         }
 
-        // --- VALIDACIONES ---
-
-        // NIVEL 1: Comprobante MUE (Entrada, No Valorizado)
-        function checkLevel1() {
+        // --- LOGICA NIVEL 1 ---
+        function checkL1(){
             const mov = document.getElementById('l1_mov').value;
+            const tal = document.getElementById('l1_tal').value;
             const val = document.getElementById('l1_val').checked;
-            
-            if (mov === 'E' && !val) {
-                showModal(true, "¡Excelente!", "Has configurado correctamente el comprobante para ingreso de muestras sin costo.");
-            } else {
-                let err = "Revisa: <br>";
-                if(mov !== 'E') err += "- El movimiento debe ser Entrada.<br>";
-                if(val) err += "- No debe ser Valorizado (costo cero).";
-                showModal(false, "Incorrecto", err);
-            }
+            const sub = document.getElementById('l1_sub').checked;
+            const cero = document.getElementById('l1_cero').checked;
+
+            let errors = [];
+            if(mov !== 'E') errors.push("El tipo de movimiento debe ser 'Entrada' para aumentar stock.");
+            if(val) errors.push("No debe ser 'Valorizado' si el costo es cero (bajaría el PPP).");
+            if(tal !== '5') errors.push("El talonario correcto para ajustes/muestras es el 5 (Ajustes).");
+            if(sub) errors.push("Las muestras gratis no suelen generar asiento contable de compra (no hay factura fiscal).");
+            if(!cero) errors.push("Debes habilitar 'Permite Precio Cero', ya que son gratis.");
+
+            if(errors.length === 0) showFeedback(true, "¡Configuración Perfecta!", "Has creado correctamente un comprobante para ingresar muestras sin distorsionar los costos de la empresa.");
+            else showFeedback(false, "Atención a los detalles", "<ul><li>" + errors.join("</li><li>") + "</li></ul>");
         }
 
-        // NIVEL 2: Talonario Interno (Letra X, No Edita, Prox 1)
-        function checkLevel2() {
+        // --- LOGICA NIVEL 2 ---
+        function checkL2(){
+            const suc = document.getElementById('l2_suc').value;
             const letra = document.getElementById('l2_letra').value;
             const edita = document.getElementById('l2_edita').checked;
             const prox = document.getElementById('l2_prox').value;
 
-            if (letra === 'X' && !edita && parseInt(prox) === 1) {
-                showModal(true, "¡Muy bien!", "Talonario interno configurado correctamente con control de numeración.");
-            } else {
-                let err = "Revisa: <br>";
-                if(letra !== 'X') err += "- Talonario interno usa Letra X.<br>";
-                if(edita) err += "- La numeración debe ser automática (no editar).<br>";
-                if(parseInt(prox) !== 1) err += "- Debe comenzar en 1.";
-                showModal(false, "Incorrecto", err);
-            }
+            let errors = [];
+            if(letra !== 'X') errors.push("Para movimientos internos NO fiscales se usa la letra X.");
+            if(suc !== '1') errors.push("La consigna pedía asociar a Casa Central (Sucursal 1).");
+            if(edita) errors.push("Queremos control estricto: La numeración debe ser automática (No editable).");
+            if(parseInt(prox) !== 1) errors.push("La numeración debe iniciar en 1.");
+
+            if(errors.length === 0) showFeedback(true, "¡Talonario Creado!", "El sistema ahora puede gestionar movimientos internos con numeración automática X.");
+            else showFeedback(false, "Error en parámetros", "<ul><li>" + errors.join("</li><li>") + "</li></ul>");
         }
 
-        // NIVEL 3: Operación (FAC, Dep 01, Cant > 0)
-        function checkLevel3() {
-            const comp = document.getElementById('l3_comp').value;
+        // --- LOGICA NIVEL 3 ---
+        function checkL3(){
+            const tipo = document.getElementById('l3_tipo').value;
+            const nro = document.getElementById('l3_nro').value.trim();
+            const prov = document.getElementById('l3_prov').value;
             const dep = document.getElementById('l3_dep').value;
             const cant = document.getElementById('l3_cant').value;
+            const precio = document.getElementById('l3_precio').value;
 
-            if (comp === 'FAC' && dep === '01' && cant > 0) {
-                showModal(true, "¡Operación Exitosa!", "Ingreso de compra registrado correctamente en Casa Central.");
-            } else {
-                let err = "Datos erróneos: <br>";
-                if(comp !== 'FAC') err += "- Usa FAC para valorizar la compra.<br>";
-                if(dep !== '01') err += "- El depósito central es el 01.<br>";
-                if(cant <= 0) err += "- Falta ingresar cantidad.";
-                showModal(false, "Error al Grabar", err);
-            }
+            let errors = [];
+            
+            // Validaciones trampas
+            if(tipo !== 'FAC') errors.push("Debes seleccionar FAC (Factura) para que valorice el stock.");
+            if(prov !== '200') errors.push("El proveedor es 'Distribuidora Electro', no el fabricante (Samsung).");
+            
+            // Validación formato Nro Comprobante (Regex simple)
+            if(nro !== 'A0001-00001234') errors.push("El número de comprobante no coincide con la factura física (A0001-00001234).");
+            
+            if(dep !== '01') errors.push("El depósito destino debe ser 01 (Casa Central).");
+            if(cant != 10) errors.push("La cantidad facturada son 10 unidades.");
+            if(precio != 850000) errors.push("El costo unitario debe ser 850000.");
+
+            if(errors.length === 0) showFeedback(true, "¡Ingreso Exitoso!", "La factura ha sido procesada. El stock aumentó y los costos se actualizaron.");
+            else showFeedback(false, "Datos Incorrectos", "Revisa los datos contra la 'Factura Física' del caso:<br><ul><li>" + errors.join("</li><li>") + "</li></ul>");
         }
     </script>
 </body>
