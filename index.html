@@ -27,6 +27,9 @@
         .menu-card:nth-child(1) .card-top { background: #4cd137; }
         .menu-card:nth-child(2) .card-top { background: #fbc531; }
         .menu-card:nth-child(3) .card-top { background: #e84118; }
+        /* Color específico para la tarjeta del juego */
+        .menu-card.game-card .card-top { background: #8e44ad; } 
+        
         .card-content { padding: 25px; }
         .card-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: #333; }
         .card-desc { color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 20px; min-height: 60px; }
@@ -147,9 +150,11 @@
                     </div>
                     <button class="btn-start">Iniciar Operación</button>
                 </div>
-                <!-- JUEGO (Nuevo Bloque para agregar) -->
-            <div class="menu-card" onclick="window.location.href='juego.html'">
-                <div class="card-top" style="background: #8e44ad;"></div> <!-- Color Violeta -->
+            </div>
+
+            <!-- JUEGO (CORREGIDO: Ahora está fuera del div del Nivel 3) -->
+            <div class="menu-card game-card" onclick="window.location.href='juego.html'">
+                <div class="card-top"></div> 
                 <div class="card-content">
                     <div class="card-title">Desafío: El Auditor 🎮</div>
                     <div class="card-desc">
@@ -159,7 +164,7 @@
                     <button class="btn-start" style="background: #8e44ad;">JUGAR AHORA</button>
                 </div>
             </div>
-            </div>
+
         </div>
     </div>
 
